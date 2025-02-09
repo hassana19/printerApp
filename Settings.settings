@@ -5,5 +5,8 @@
     <Setting Name="SelectedPrinter" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="PageWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">2.8</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

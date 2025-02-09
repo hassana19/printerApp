@@ -16,3 +16,4 @@ C:\printer\DauPrinterApp\obj\Debug\net8.0-windows\DauPrinterApp.genruntimeconfig
 C:\printer\DauPrinterApp\obj\Debug\net8.0-windows\ref\DauPrinterApp.dll
 C:\printer\DauPrinterApp\bin\Debug\net8.0-windows\icon.ico
 C:\printer\DauPrinterApp\bin\Debug\net8.0-windows\DauPrinterApp.dll.config
+C:\printer\DauPrinterApp\bin\Debug\net8.0-windows\sumatra.exe

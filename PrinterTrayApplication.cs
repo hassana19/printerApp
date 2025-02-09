@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Printing;
 using System.IO;
 using System.Net;
 using System.Net.WebSockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -136,8 +138,37 @@ namespace DauPrinterApp
                 }
             }
         }
+        private string WordWrap(string text, Font font, SizeF layoutSize, Graphics graphics)
+        {
+            string[] words = text.Split(' '); string wrappedText = ""; string line = ""; foreach (string word in words)
+            {
+                string testLine = (line.Length == 0) ? word : line + " " + word; SizeF testSize = graphics.MeasureString(testLine, font, (int)layoutSize.Width); if (testSize.Width > layoutSize.Width)
+                {
+                    wrappedText += line + "\n"; // New line when text exceeds width
+                                   line = word; 
+                } else { line = testLine; } 
+            } wrappedText += line; // Add the last line
+                                  
+            return wrappedText;
+         }
 
-        private void PrintToSelectedPrinter(string text)
+        private bool IsPdfUrl(string data)
+        {
+            if (string.IsNullOrWhiteSpace(data))
+                return false;
+
+            try
+            {
+                Uri uri = new Uri(data);
+                return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
+                     
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        private void PrintToSelectedPrinter(string data)
         {
             if (string.IsNullOrEmpty(selectedPrinter))
             {
@@ -149,10 +180,45 @@ namespace DauPrinterApp
             {
                 PrintDocument printDocument = new PrintDocument();
                 printDocument.PrinterSettings.PrinterName = selectedPrinter;
-                printDocument.PrintPage += (sender, e) =>
+
+                float pageWidthInInches = (float)Settings.Default.PageWidth;
+                int pageWidth = (int)(pageWidthInInches * 100); // Convert inches to hundredths
+
+                printDocument.DefaultPageSettings.PaperSize = new PaperSize("Custom", pageWidth, 1100);
+
+                // Detect if input is a Base64 image
+                if (IsPdfUrl(data))
                 {
-                    e.Graphics.DrawString(text, new Font("Arial", 12), Brushes.Black, 10, 10);
-                };
+                    PrintPdfFromUrl(data);
+                }
+                else if (IsBase64Image(data))
+                {
+                    Image image = Base64ToImage(data);
+
+                    printDocument.PrintPage += (sender, e) =>
+                    {
+                        Image resizedImage = ResizeImage(image, e.PageBounds.Width);
+                        e.Graphics.DrawImage(resizedImage, new Point(0, 0));
+                    };
+                }
+                else
+                {
+                    // Standard text printing
+                    printDocument.PrintPage += (sender, e) =>
+                    {
+                        Graphics graphics = e.Graphics;
+                        Font font = new Font("Courier New", 9, FontStyle.Regular);
+                        SolidBrush brush = new SolidBrush(Color.Black);
+                        float x = 5, y = 5;
+                        float maxWidth = e.PageBounds.Width - 10;
+
+                        StringFormat format = new StringFormat();
+                        format.Alignment = StringAlignment.Near;
+
+                        string wrappedText = WordWrap(data, font, new SizeF(maxWidth, e.PageBounds.Height), graphics);
+                        graphics.DrawString(wrappedText, font, brush, new RectangleF(x, y, maxWidth, e.PageBounds.Height), format);
+                    };
+                }
 
                 printDocument.Print();
                 Log("Printing...");
@@ -162,6 +228,162 @@ namespace DauPrinterApp
                 Log($"Printing error: {ex.Message}");
             }
         }
+
+        private void PrintPdf(string filePath)
+        {
+            try
+            {
+                string sumatraPath = @"sumatra.exe"; // Change if needed
+
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = sumatraPath,
+                    Arguments = $"-print-to \"{selectedPrinter}\" \"{filePath}\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+
+                Process process = Process.Start(psi);
+                if (process != null)
+                {
+                    process.WaitForExit();
+                    Log("PDF printed successfully.");
+                }
+                else
+                {
+                    Log("Failed to start SumatraPDF.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Error printing PDF: {ex.Message}");
+            }
+        }
+
+        private void PrintPdfFromUrl(string pdfUrl)
+        {
+            try
+            {
+                string tempFilePath = Path.Combine(Path.GetTempPath(), "temp_print.pdf");
+
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadFile(pdfUrl, tempFilePath);
+                    Log($"Downloaded PDF to: {tempFilePath}");
+                }
+
+                PrintPdf(tempFilePath);
+            }
+            catch (Exception ex)
+            {
+                Log($"Error downloading PDF: {ex.Message}");
+            }
+        }
+        private bool IsBase64Image(string base64)
+        {
+            base64 = base64.Trim();
+
+            // Check if it starts with "data:image/" (data URL format)
+            if (base64.StartsWith("data:image/"))
+                return true;
+
+            // If it is a raw Base64 string, check valid encoding pattern
+            return (base64.Length % 4 == 0) && Regex.IsMatch(base64, @"^[a-zA-Z0-9\+/]*={0,2}$");
+        }
+
+
+        private Image Base64ToImage(string base64String)
+        {
+            try
+            {
+                // Remove Base64 prefix if it exists (e.g., "data:image/png;base64,")
+                if (base64String.Contains(","))
+                    base64String = base64String.Split(',')[1];
+
+                byte[] imageBytes = Convert.FromBase64String(base64String);
+                using (MemoryStream ms = new MemoryStream(imageBytes))
+                {
+                    return Image.FromStream(ms);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Error decoding Base64 image: {ex.Message}");
+                return null;
+            }
+        }
+
+        private Image ResizeImage(Image image, int width)
+        {
+            if (image == null) return null;
+
+            int newHeight = (int)((double)image.Height / image.Width * width); // Maintain aspect ratio
+            Bitmap resized = new Bitmap(image, new Size(width, newHeight));
+            return resized;
+        }
+
+
+
+
+        /*
+        private void PrintToSelectedPrinter(string text)
+        {
+            if (string.IsNullOrEmpty(selectedPrinter))
+            {
+                MessageBox.Show("No printer selected!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            try
+            {
+                //PrintDocument printDocument = new PrintDocument();
+                //printDocument.PrinterSettings.PrinterName = selectedPrinter;
+                //double pageWidth = Settings.Default.PageWidth;
+                //printDocument.DefaultPageSettings.PaperSize = new PaperSize("Custom", (int)(pageWidth * 100), 1100); // Page width in 100ths of an inch, adjust height if needed
+
+                //printDocument.PrintPage += (sender, e) =>
+                //{
+                //    e.Graphics.DrawString(text, new Font("Arial", 12), Brushes.Black, 10, 10);
+                //};
+
+              
+
+                PrintDocument printDocument = new PrintDocument();
+                printDocument.PrinterSettings.PrinterName = selectedPrinter;
+
+                // Get page width from settings and convert to hundredths of an inch (1 inch = 100)
+                float pageWidthInInches = (float)Settings.Default.PageWidth;
+                int pageWidth = (int)(pageWidthInInches * 100); // Convert inches to hundredths
+
+                printDocument.DefaultPageSettings.PaperSize = new PaperSize("Custom", pageWidth, 1100); // Height is auto-adjusted
+
+                printDocument.PrintPage += (sender, e) =>
+                {
+                    Graphics graphics = e.Graphics;
+                    Font font = new Font("Courier New", 9, FontStyle.Regular); // Use monospaced font for better alignment
+                    SolidBrush brush = new SolidBrush(Color.Black);
+                    float x = 5;  // Left padding
+                    float y = 5;  // Top padding
+                    float maxWidth = e.PageBounds.Width - 10; // Set max width
+
+                    StringFormat format = new StringFormat();
+                    format.Alignment = StringAlignment.Near;
+
+                    // Wrap text to fit within 3-inch width
+                    SizeF layoutSize = new SizeF(maxWidth, e.PageBounds.Height);
+                    string wrappedText = WordWrap(text, font, layoutSize, graphics);
+
+                    graphics.DrawString(wrappedText, font, brush, new RectangleF(x, y, maxWidth, e.PageBounds.Height), format);
+                };
+                printDocument.Print();
+                Log("Printing...");
+            }
+            catch (Exception ex)
+            {
+                Log($"Printing error: {ex.Message}");
+            }
+        }
+        */
 
         private void ShowSettings(object sender, EventArgs e)
         {

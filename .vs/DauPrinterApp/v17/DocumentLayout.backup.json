@@ -7,12 +7,16 @@
       "RelativeMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|solutionrelative:printertrayapplication.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|c:\\printer\\dauprinterapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|c:\\printer\\dauprinterapp\\settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|solutionrelative:settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|c:\\printer\\dauprinterapp\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
-      "RelativeMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+      "AbsoluteMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|C:\\printer\\DauPrinterApp\\settings.settings||{6D2695F9-5365-4A78-89ED-F205C045BFE6}",
+      "RelativeMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|solutionrelative:settings.settings||{6D2695F9-5365-4A78-89ED-F205C045BFE6}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|C:\\printer\\DauPrinterApp\\settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{1404D857-E080-4F37-AB0C-7CBD7E34D703}|DauPrinterApp.csproj|solutionrelative:settingsform.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,8 +26,43 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 3,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Settings.settings",
+              "DocumentMoniker": "C:\\printer\\DauPrinterApp\\Settings.settings",
+              "RelativeDocumentMoniker": "Settings.settings",
+              "ToolTip": "C:\\printer\\DauPrinterApp\\Settings.settings",
+              "RelativeToolTip": "Settings.settings",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.002767|",
+              "WhenOpened": "2025-02-09T16:48:41.848Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "SettingsForm.cs",
+              "DocumentMoniker": "C:\\printer\\DauPrinterApp\\SettingsForm.cs",
+              "RelativeDocumentMoniker": "SettingsForm.cs",
+              "ToolTip": "C:\\printer\\DauPrinterApp\\SettingsForm.cs",
+              "RelativeToolTip": "SettingsForm.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-09T16:13:39.254Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SettingsForm.cs [Design]",
+              "DocumentMoniker": "C:\\printer\\DauPrinterApp\\SettingsForm.cs",
+              "RelativeDocumentMoniker": "SettingsForm.cs",
+              "ToolTip": "C:\\printer\\DauPrinterApp\\SettingsForm.cs [Design]",
+              "RelativeToolTip": "SettingsForm.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-09T16:13:27.457Z"
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -32,35 +71,10 @@
               "RelativeDocumentMoniker": "PrinterTrayApplication.cs",
               "ToolTip": "C:\\printer\\DauPrinterApp\\PrinterTrayApplication.cs",
               "RelativeToolTip": "PrinterTrayApplication.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAIwEMAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAJMAAAAAAAAAAAAmwKIAAABbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-09T15:02:50.739Z",
+              "WhenOpened": "2025-02-09T16:11:42.645Z",
               "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\printer\\DauPrinterApp\\Program.cs",
-              "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\printer\\DauPrinterApp\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-09T15:01:25.473Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Form1.cs [Design]",
-              "DocumentMoniker": "C:\\printer\\DauPrinterApp\\Form1.cs",
-              "RelativeDocumentMoniker": "Form1.cs",
-              "ToolTip": "C:\\printer\\DauPrinterApp\\Form1.cs [Design]",
-              "RelativeToolTip": "Form1.cs [Design]",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-09T15:00:01.372Z",
-              "EditorCaption": " [Design]"
             }
           ]
         }
