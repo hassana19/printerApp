@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace PrinterTrayApp
+namespace DauPrinterApp
 {
     public partial class SettingsForm : Form
     {

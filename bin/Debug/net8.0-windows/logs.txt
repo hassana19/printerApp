@@ -1,0 +1,8 @@
+2/9/2025 8:06:21 PM: WebSocket server started on ws://localhost:8080/
+2/9/2025 8:09:56 PM: Selected Printer: FIT FP-1100 Raster
+2/9/2025 8:10:03 PM: Selected Printer: FIT FP-1100 Raster
+2/9/2025 8:44:25 PM: WebSocket server started on ws://localhost:8080/
+2/9/2025 8:44:52 PM: WebSocket server started on ws://localhost:8080/
+2/9/2025 8:45:44 PM: WebSocket server started on ws://localhost:8080/
+2/9/2025 8:45:53 PM: WebSocket server started on ws://localhost:8080/
+2/9/2025 8:46:06 PM: Selected Printer: FIT FP-1100 Raster

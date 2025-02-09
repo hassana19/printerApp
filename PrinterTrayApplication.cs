@@ -1,23 +1,21 @@
 using System;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
+using System.Collections.Generic;
 using System.Drawing.Printing;
-using System.Timers;
+using System.IO;
 using System.Net;
 using System.Net.WebSockets;
-using System.Threading;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
+using System.Windows.Forms;
 
-namespace PrinterTrayApp
+namespace DauPrinterApp
 {
     public class PrinterTrayApplication
     {
-        private NotifyIcon notifyIcon;
-        private ContextMenuStrip contextMenu;
-        private System.Timers.Timer refreshTimer;
+        private NotifyIcon trayIcon;
+        private ContextMenuStrip trayMenu;
+        private ToolStripMenuItem printersMenu;
         private string selectedPrinter;
         private int webSocketPort = 8080;
         private HttpListener httpListener;
@@ -25,74 +23,59 @@ namespace PrinterTrayApp
 
         public PrinterTrayApplication()
         {
-            notifyIcon = new NotifyIcon
+            // Load saved printer from settings
+            selectedPrinter = Settings.Default.SelectedPrinter;
+
+            // Setup tray icon and menu
+            trayMenu = new ContextMenuStrip();
+            printersMenu = new ToolStripMenuItem("Select Printer");
+
+            // Load printer list and settings
+            PopulatePrintersMenu();
+
+            trayMenu.Items.Add(printersMenu);
+            trayMenu.Items.Add(new ToolStripSeparator());
+            trayMenu.Items.Add("Settings", null, ShowSettings);
+            trayMenu.Items.Add(new ToolStripSeparator());
+            trayMenu.Items.Add("Exit", null, OnExit);
+
+            trayIcon = new NotifyIcon
             {
-                Icon = SystemIcons.Print,
-                Text = "Printer Tray App",
+                Icon = new Icon("icon.ico"),
+                ContextMenuStrip = trayMenu,
                 Visible = true
             };
 
-            contextMenu = new ContextMenuStrip();
-            PopulateMenu();
-
-            notifyIcon.ContextMenuStrip = contextMenu;
-
-            // Timer to refresh printer list
-            refreshTimer = new System.Timers.Timer(10000);
-            refreshTimer.Elapsed += (s, e) => PopulateMenu();
-            refreshTimer.Start();
-
             // Start WebSocket server
             StartWebSocketServer();
+
+            // Start the refresh timer for printer list
+            var refreshTimer = new System.Timers.Timer(10000);
+            refreshTimer.Elapsed += (s, e) => PopulatePrintersMenu();
+            refreshTimer.Start();
         }
 
-        private void PopulateMenu()
+        private void PopulatePrintersMenu()
         {
-            if (contextMenu.InvokeRequired)
+            printersMenu.DropDownItems.Clear();
+            foreach (string printer in PrinterSettings.InstalledPrinters)
             {
-                contextMenu.Invoke(new Action(PopulateMenu));
-                return;
-            }
-
-            contextMenu.Items.Clear();
-
-            // Configure Option
-            ToolStripMenuItem configItem = new ToolStripMenuItem("Settings");
-            configItem.Click += (s, e) =>
-            {
-                new SettingsForm(this).ShowDialog();
-            };
-            contextMenu.Items.Add(configItem);
-
-            // Separator
-            contextMenu.Items.Add(new ToolStripSeparator());
-
-            // List installed printers
-            foreach (var printer in PrinterSettings.InstalledPrinters.Cast<string>())
-            {
-                ToolStripMenuItem printerItem = new ToolStripMenuItem(printer);
-                printerItem.Click += (s, e) =>
+                var item = new ToolStripMenuItem(printer)
                 {
-                    selectedPrinter = printer;
-                    Log($"Selected Printer: {printer}");
-                    MessageBox.Show($"Selected Printer: {printer}", "Printer Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    Checked = (printer == selectedPrinter)
                 };
-                contextMenu.Items.Add(printerItem);
+                item.Click += (sender, e) => SelectPrinter(printer);
+                printersMenu.DropDownItems.Add(item);
             }
+        }
 
-            // Separator
-            contextMenu.Items.Add(new ToolStripSeparator());
-
-            // Exit option
-            ToolStripMenuItem exitItem = new ToolStripMenuItem("Exit");
-            exitItem.Click += (s, e) =>
-            {
-                refreshTimer.Stop();
-                notifyIcon.Visible = false;
-                httpListener?.Stop();
-                Application.Exit();
-            };
-            contextMenu.Items.Add(exitItem);
+        private void SelectPrinter(string printer)
+        {
+            selectedPrinter = printer;
+            Settings.Default.SelectedPrinter = printer;
+            Settings.Default.Save(); // Save to application settings
+            PopulatePrintersMenu(); // Refresh menu
+            Log($"Selected Printer: {printer}");
         }
 
         private async void StartWebSocketServer()
@@ -178,6 +161,18 @@ namespace PrinterTrayApp
             {
                 Log($"Printing error: {ex.Message}");
             }
+        }
+
+        private void ShowSettings(object sender, EventArgs e)
+        {
+            new SettingsForm(this).ShowDialog();
+        }
+
+        private void OnExit(object sender, EventArgs e)
+        {
+            trayIcon.Visible = false;
+            httpListener?.Stop();
+            Application.Exit();
         }
 
         private void Log(string message)
